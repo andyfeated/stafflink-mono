@@ -2,6 +2,9 @@ import React from "react";
 import { Button, TextField} from '@mui/material'
 import * as yup from 'yup'
 import { useFormik } from 'formik'
+import loginServices from '../services/login'
+import useUserStore from "../stores/userStore";
+import router from 'next/router'
 
 const validationSchema = yup.object({
   email: yup
@@ -15,16 +18,31 @@ const validationSchema = yup.object({
 });
 
 
-export default function LoginForm({ setActiveTab }){
+export default function LoginForm({ setActiveTab, setOpenError }){
+  const setUser = useUserStore((state) => state.setUser)
+  
+  const handleSubmitLogin = async (values) => {
+    try {
+      const result = await loginServices.login(values)
+      
+      if(result.data){
+        setUser({ name: result.data.name, email: result.data.email })
+        localStorage.setItem('currentEmployee', JSON.stringify(result.data))
+        router.push('/')
+      }
+    }catch(e){
+      setOpenError(true)
+      console.log(e)
+    }
+  }
+  
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values)
-    }
+    onSubmit: (values) => handleSubmitLogin(values)
   })
   
   return (

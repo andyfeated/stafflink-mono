@@ -58,6 +58,7 @@ export default function RegisterForm({ setActiveTab, setOpenSuccess }){
       lastName: '',
       companyEmail: '',
       phone: '',
+      password: '',
       confirmPassword: ''
     },
     validationSchema: validationSchema,

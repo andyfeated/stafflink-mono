@@ -16,7 +16,8 @@
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "yup": "^1.2.0"
+    "yup": "^1.2.0",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
     "eslint": "8.48.0",

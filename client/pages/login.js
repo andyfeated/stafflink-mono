@@ -6,12 +6,14 @@ import { Alert, Snackbar } from "@mui/material"
 export default function Login(){
   const [activeTab, setActiveTab] = useState('login')
   const [openSuccess, setOpenSuccess] = useState(false)
+  const [openError, setOpenError] = useState(false)
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
 
+    setOpenError(false)
     setOpenSuccess(false);
   };
 
@@ -27,7 +29,7 @@ export default function Login(){
       </div>
 
       {activeTab === 'login' && (
-        <LoginForm setActiveTab={setActiveTab}></LoginForm>
+        <LoginForm setActiveTab={setActiveTab} setOpenError={setOpenError}></LoginForm>
       )}
       
       {activeTab === 'register' && (
@@ -41,6 +43,16 @@ export default function Login(){
       >
         <Alert severity="success" sx={{ width: '100%' }}>
           Account was successfully created
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={openError}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert severity='error' sx={{ width: '100%' }}>
+          Invalid credentials
         </Alert>
       </Snackbar>
     </div>

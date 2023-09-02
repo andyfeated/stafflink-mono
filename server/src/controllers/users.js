@@ -60,7 +60,6 @@ users.post('/', async (req, res) => {
     [firstName, lastName, companyEmail, 'hrManager', password_hash, phone, newCompany.id]
   )
 
-  console.log('works')
   const newEmployee = await new Promise((resolve, reject) => {
     db.get("SELECT * FROM employees WHERE email = ?;", [companyEmail], (err, newEmp) => {
       if (err){
@@ -70,7 +69,6 @@ users.post('/', async (req, res) => {
       }
     })
   })
-  console.log(newEmployee)
 
   return res.status(201).json({ newEmployee })
 })
