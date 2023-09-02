@@ -2,12 +2,13 @@ import React from "react";
 import { Button, TextField} from '@mui/material'
 import * as yup from 'yup'
 import { useFormik } from "formik";
+import userServices from '../services/users';
 
 
 const validationSchema = yup.object({
-  email: yup
+  companyName: yup
     .string('Enter your Company Name')
-    .required('Email is required'),
+    .required('Company Name is required'),
   websiteUrl: yup
     .string('Enter your Website URL')
     .required('Website URL is required'),
@@ -34,10 +35,24 @@ const validationSchema = yup.object({
 });
 
 
-export default function RegisterForm({ setActiveTab }){
+export default function RegisterForm({ setActiveTab, setOpenSuccess }){
+  
+  const handleSubmitRegister = async (values) => {
+    try {
+      const result = await userServices.signUp(values)
+      
+      if (result.data.newEmployee) {
+        setOpenSuccess(true)
+        setActiveTab('login')
+      }
+    }catch(e){
+      console.log(e)
+    }
+  }
+    
   const formik = useFormik({
     initialValues: {
-      email: '',
+      companyName: '',
       websiteUrl: '',
       firstName: '',
       lastName: '',
@@ -46,9 +61,7 @@ export default function RegisterForm({ setActiveTab }){
       confirmPassword: ''
     },
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      console.log(values)
-    }
+    onSubmit: async (values) => handleSubmitRegister(values),
   })
   
   return (
@@ -58,11 +71,11 @@ export default function RegisterForm({ setActiveTab }){
 
         <form onSubmit={formik.handleSubmit} noValidate style={{display: 'flex', flexWrap:'wrap', marginTop:10}}>
           <TextField 
-            name="email"
+            name="companyName"
             onChange={formik.handleChange} 
-            value={formik?.values?.email} 
-            error={formik.touched.email && Boolean(formik.errors.email)}
-            helperText={formik.touched.email && formik.errors.email}
+            value={formik?.values?.companyName} 
+            error={formik.touched.companyName && Boolean(formik.errors.companyName)}
+            helperText={formik.touched.companyName && formik.errors.companyName}
             size='small' 
             style={{width: '90%'}} 
             label="Company Name"

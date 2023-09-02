@@ -1,10 +1,20 @@
-import Image from "next/image"
 import React, { useEffect, useState } from "react"
 import RegisterForm from "../components/RegisterForm"
 import LoginForm from '../components/LoginForm'
+import { Alert, Snackbar } from "@mui/material"
 
 export default function Login(){
   const [activeTab, setActiveTab] = useState('login')
+  const [openSuccess, setOpenSuccess] = useState(false)
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpenSuccess(false);
+  };
+
 
   return (
     <div style={{height: 920, display:'flex'}}>
@@ -21,9 +31,18 @@ export default function Login(){
       )}
       
       {activeTab === 'register' && (
-        <RegisterForm setActiveTab={setActiveTab}></RegisterForm>
+        <RegisterForm setActiveTab={setActiveTab} setOpenSuccess={setOpenSuccess}></RegisterForm>
       )}
       
+      <Snackbar
+        open={openSuccess}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert severity="success" sx={{ width: '100%' }}>
+          Account was successfully created
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
