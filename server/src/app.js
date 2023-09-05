@@ -6,11 +6,13 @@ require('../src/utils/db')
 
 const usersRouter = require('../src/controllers/users')
 const loginRouter = require('../src/controllers/login')
+const companiesRouter = require('../src/controllers/companies')
 
 app.use(cors())
 app.use(express.json())
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use('/api/companies', companiesRouter)
 
 module.exports = app;

@@ -85,18 +85,22 @@ export default function Header({ activeTab }){
           <PersonIcon style={{color: 'white', fontSize: 25}}></PersonIcon>
           <p className="source-font" style={{ color: 'white', margin: 0}}>Profile</p>
         </div>
-        <div onClick={() => handleClickPage('company')} style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'company' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
-          <BusinessIcon style={{color: 'white', fontSize: 25}}></BusinessIcon>
-          <p className="source-font" style={{ color: 'white', margin: 0}}>Company</p>
-        </div>
-        <div onClick={() => handleClickPage('buletin')}  style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'buletin' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
-          <AnnouncementIcon style={{color: 'white', fontSize: 25}}></AnnouncementIcon>
-          <p className="source-font" style={{ color: 'white', margin: 0}}>Buletin</p>
-        </div>
-        <div onClick={() => handleClickPage('documents')} style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'documents' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
-          <TaskIcon style={{color: 'white', fontSize: 25}}></TaskIcon>
-          <p className="source-font" style={{ color: 'white', margin: 0}}>Documents</p>
-        </div>
+       {userRole === 'hrManager' && (
+        <>
+          <div onClick={() => handleClickPage('company')} style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'company' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
+            <BusinessIcon style={{color: 'white', fontSize: 25}}></BusinessIcon>
+            <p className="source-font" style={{ color: 'white', margin: 0}}>Company</p>
+          </div>
+          <div onClick={() => handleClickPage('buletin')}  style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'buletin' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
+            <AnnouncementIcon style={{color: 'white', fontSize: 25}}></AnnouncementIcon>
+            <p className="source-font" style={{ color: 'white', margin: 0}}>Buletin</p>
+          </div>
+          <div onClick={() => handleClickPage('documents')} style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'documents' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
+            <TaskIcon style={{color: 'white', fontSize: 25}}></TaskIcon>
+            <p className="source-font" style={{ color: 'white', margin: 0}}>Documents</p>
+          </div>
+        </>
+       )}
       </div>
     </>
   )

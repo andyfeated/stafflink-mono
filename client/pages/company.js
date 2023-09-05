@@ -3,11 +3,16 @@ import Header from "../components/Header"
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { Box, Button, IconButton, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
+import { Box, Button, IconButton, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import useUserStore from "../stores/userStore";
 import userServices from '../services/users'
+import companyServices from '../services/companies'
 import UpdateEmployeeModal from "../components/UpdateEmployeeModal";
+import CancelIcon from '@mui/icons-material/Cancel';
+import CheckIcon from '@mui/icons-material/Check';
 import AddEmployeeModal from "../components/AddEmployeeModal";
+import * as yup from 'yup'
+import { useFormik } from "formik";
 
 const style = {
   position: 'absolute',
@@ -19,6 +24,15 @@ const style = {
   p: 3,
 };
 
+const validationSchema = yup.object({
+  name: yup
+    .string('Enter Company Name')
+    .required('Company Name is required'),
+  websiteUrl: yup
+    .string('Enter Company Website URL')
+    .required('Website URL is required'),
+});
+
 export default function Company() {
   const companyId = useUserStore((state) => state.companyId)
   const userId = useUserStore((state) => state.id)
@@ -29,20 +43,43 @@ export default function Company() {
   const [employees, setEmployees] = useState([])
 
   const [selectedEmployee, setSelectedEmployee] = useState(null)
+  const [editCompany, setEditCompany] = useState(false)
+
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      websiteUrl: ''
+    },
+    validationSchema: validationSchema,
+    onSubmit: async ({ id, ...rest}) => {
+      const userJSON = localStorage.getItem('currentEmployee');
+      const parsedUser = JSON.parse(userJSON);
+
+      await companyServices.updateCompany(companyId, parsedUser.token, rest)
+      setEditCompany(false)
+    },
+  })
 
   useEffect( () => {
     if(companyId){
-      const getEmployees = async () => {
+      const getEmployeesAndCompany = async () => {
         const userJSON = localStorage.getItem('currentEmployee');
         const parsedUser = JSON.parse(userJSON);
 
         const employeesData = await userServices.getUsers(companyId, parsedUser.token)
+        const companyData = await companyServices.getCompany(companyId, parsedUser.token)
+        
         setEmployees(employeesData.data)
+        formik.setValues(companyData.data)
       }
 
-      getEmployees()
+      getEmployeesAndCompany()
     }
   }, [companyId])
+
+  useEffect(() => {
+    console.log(selectedEmployee)
+  }, [selectedEmployee])
 
   const handleClickUpdateEmployee = (emp) => {
     setSelectedEmployee(emp)
@@ -76,7 +113,7 @@ export default function Company() {
     <>
       <Header activeTab='company'></Header>
 
-      <div style={{background: "#f5f4f4", height: 760, padding: 25}}>
+      <div style={{background: "#f5f4f4", height: 760, padding: 25, display:'flex'}}>
           <div style={{ height: '100%', background: 'white', width: '60%', padding: 20, borderRadius: 10}}>
             <div style={{display: 'flex', justifyContent: 'space-between'}}>
               <p className="source-font-bold" style={{ fontWeight: 500, fontSize: 19, margin: 0, color: "#0b0045", marginTop: 5 }}>Employees</p>
@@ -174,6 +211,84 @@ export default function Company() {
               </div>
             </Box>
           </Modal>
+
+          <div style={{ height: '50%', background: 'white', width: '40%', padding: 20, borderRadius: 10, marginLeft: 20}}>
+            <div style={{display: 'flex', justifyContent: 'space-between'}}>
+              <p className="source-font-bold" style={{ fontWeight: 500, fontSize: 19, margin: 0, color: "#0b0045", marginTop: 5 }}>Company Details</p>
+            </div>
+
+
+            <form onSubmit={formik.handleSubmit} style={{display:'flex', flexWrap:'wrap'}}>
+              <div style={{width: '100%', marginTop: 10}}>
+                <p className="source-font" style={{margin: '10px 0'}}>Company Name</p>
+                <TextField
+                  disabled={!editCompany}
+                  name="name"
+                  onChange={formik.handleChange} 
+                  value={formik?.values?.name} 
+                  error={formik.touched.name && Boolean(formik.errors.name)}
+                  helperText={formik.touched.name && formik.errors.name} 
+                  size='small' 
+                  style={{width: '98%'}} 
+                />
+              </div>
+
+              <div style={{width: '100%', marginTop: 10}}>
+                <p className="source-font" style={{margin: '10px 0'}}>Website URL</p>
+                <TextField 
+                  disabled={!editCompany}
+                  name="websiteUrl"
+                  onChange={formik.handleChange} 
+                  value={formik?.values?.websiteUrl} 
+                  error={formik.touched.websiteUrl && Boolean(formik.errors.websiteUrl)}
+                  helperText={formik.touched.websiteUrl && formik.errors.websiteUrl} 
+                  size='small' 
+                  style={{width: '98%'}} 
+                />
+              </div>
+
+              <div style={{display: 'flex', justifyContent: 'end', width: '100%', marginTop: 40}}>
+                {!editCompany && (
+                  <Button
+                    className="source-font"
+                    style={{
+                      background: '#0b0045', color: 'white', textTransform:'capitalize'
+                    }}
+                    startIcon={<EditIcon></EditIcon>}
+                    onClick={() => setEditCompany(true)}
+                  >
+                    Edit Company
+                  </Button>
+                )}
+
+                {editCompany && (
+                  <div style={{display: 'flex'}}>
+                    <Button 
+                      className="source-font"
+                      startIcon={<CancelIcon></CancelIcon>}
+                      style={{
+                        background: '#e94100', color: 'white', textTransform:'capitalize', marginRight: 10
+                      }}
+                      onClick={() => setEditCompany(false)}
+                    >
+                      Cancel
+                    </Button>
+
+                    <Button 
+                      type="submit"
+                      className="source-font"
+                      startIcon={<CheckIcon></CheckIcon>}
+                      style={{
+                        background: '#0b0045', color: 'white', textTransform:'capitalize'
+                      }}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </form>
+          </div>
       </div>
     </>
   )

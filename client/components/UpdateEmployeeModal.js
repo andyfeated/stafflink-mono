@@ -33,8 +33,6 @@ const style = {
 };
 
 export default function UpdateEmployeeModal({ openUpdateEmployeeModal, setOpenUpdateEmployeeModal, selectedEmployee, setSelectedEmployee, setEmployees, employees }) {
-  const userId = useUserStore((state) => state.id)
-
   const formik = useFormik({
     initialValues: {
       title: '',
@@ -50,7 +48,7 @@ export default function UpdateEmployeeModal({ openUpdateEmployeeModal, setOpenUp
       const userJSON = localStorage.getItem('currentEmployee');
       const parsedUser = JSON.parse(userJSON);
       
-      const result = await userServices.updateUser(userId, parsedUser.token, values)
+      const result = await userServices.updateUser(selectedEmployee.id, parsedUser.token, values)
       if(result.data){
         const newEmployees = employees.map(e => {
           if(e.id === selectedEmployee.id){
