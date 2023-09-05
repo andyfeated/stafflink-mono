@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react"
 import Header from "../components/Header"
 import AddIcon from '@mui/icons-material/Add';
-import CheckIcon from '@mui/icons-material/Check';
-import * as yup from 'yup'
-import { Box, Button, MenuItem, Modal, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
-import { useFormik } from "formik";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import { Box, Button, IconButton, Modal, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import useUserStore from "../stores/userStore";
 import userServices from '../services/users'
+import UpdateEmployeeModal from "../components/UpdateEmployeeModal";
+import AddEmployeeModal from "../components/AddEmployeeModal";
 
 const style = {
   position: 'absolute',
@@ -18,34 +19,16 @@ const style = {
   p: 3,
 };
 
-const addEmployeeValidationSchema = yup.object({
-  firstName: yup
-    .string("Enter the Employee's First Name")
-    .required('First Name is required'),
-  lastName: yup
-    .string("Enter the Employee's Last Name")
-    .required('Last Name is required'),
-  email: yup
-    .string("Enter the Employee's Company email")
-    .email('Enter a valid email')
-    .required('Email is required'),
-  role: yup
-    .string("Enter the Employee's Role email")
-    .required('Role is required'),
-  password: yup
-    .string('Enter your password')
-    .min(8, 'Password should be of minimum 8 characters length')
-    .required('Password is required'),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref('password'), null], 'Passwords must match')
-});
-
 export default function Company() {
   const companyId = useUserStore((state) => state.companyId)
+  const userId = useUserStore((state) => state.id)
 
-  const [openModal, setOpenModal] = useState(false)
+  const [openAddEmployeeModal, setOpenAddEmployeeModal] = useState(false)
+  const [openUpdateEmployeeModal, setOpenUpdateEmployeeModal] = useState(false)
+  const [openDeleteEmployeeModal, setOpenDeleteEmployeeModal] = useState(false)
   const [employees, setEmployees] = useState([])
+
+  const [selectedEmployee, setSelectedEmployee] = useState(null)
 
   useEffect( () => {
     if(companyId){
@@ -57,196 +40,36 @@ export default function Company() {
         setEmployees(employeesData.data)
       }
 
-      console.log(companyId)
       getEmployees()
     }
   }, [companyId])
-  
-  const addEmployeeModal = () => {
-    const formik = useFormik({
-      initialValues: {
-        title: '',
-        department: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        role: '',
-        password: '',
-        confirmPassword: ''
-      },
-      validationSchema: addEmployeeValidationSchema,
-      onSubmit: async (values) => {
-        const userJSON = localStorage.getItem('currentEmployee');
-        const parsedUser = JSON.parse(userJSON);
-        
-        const result = await userServices.addUser(companyId, parsedUser.token, values)
-        setOpenModal(false)
-        setEmployees([...employees, result.data])
-      }
-    })
-    
-    return (
-      <Modal
-        open={openModal}
-        onClose={() => {
-          formik.resetForm()
-          setOpenModal(false)
-        }}
-      >
-        <Box sx={style}>
-          <form onSubmit={formik.handleSubmit} style={{display:'flex', flexWrap:'wrap'}}>
-            <div style={{ width: '100%'}}>
-              <p className="source-font-bold" style={{ fontSize: 20, margin: 0, marginTop: -5}}>Add Employee</p>
-            </div>
-                        
-            <div style={{width: '49.5%', marginTop: 10}}>              
-              <p className="source-font" style={{margin: '10px 0'}}>First Name</p>
-              <TextField
-                name="firstName"
-                placeholder="Enter the Employee's first name"
-                onChange={formik.handleChange} 
-                value={formik?.values?.firstName} 
-                error={formik.touched.firstName && Boolean(formik.errors.firstName)}
-                helperText={formik.touched.firstName && formik.errors.firstName} 
-                size='small' 
-                style={{width: '98%'}} 
-              />
-            </div>
 
-            <div style={{width: '49.5%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Last Name</p>
-              <TextField
-                placeholder="Enter the Employee's last name"
-                name="lastName"
-                onChange={formik.handleChange} 
-                value={formik?.values?.lastName} 
-                error={formik.touched.lastName && Boolean(formik.errors.lastName)}
-                helperText={formik.touched.lastName && formik.errors.lastName} 
-                size='small' 
-                style={{width: '98%'}} 
-              />
-            </div>
+  const handleClickUpdateEmployee = (emp) => {
+    setSelectedEmployee(emp)
+    setOpenUpdateEmployeeModal(true)
+  }
 
-            <div style={{width: '100%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Company Email</p>
-              <TextField
-                name="email"
-                placeholder="Enter the Employee's email"
-                onChange={formik.handleChange} 
-                value={formik?.values?.email} 
-                error={formik.touched.email && Boolean(formik.errors.email)}
-                helperText={formik.touched.email && formik.errors.email} 
-                size='small' 
-                style={{width: '98%'}} 
-              />
-            </div>
+  const handleClickDeleteEmployee = (emp) => {
+    setSelectedEmployee(emp)
+    setOpenDeleteEmployeeModal(true)
+  }
 
-            <div style={{width: '100%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Title</p>
-              <TextField
-                name="title"
-                onChange={formik.handleChange} 
-                value={formik?.values?.title} 
-                error={formik.touched.title && Boolean(formik.errors.title)}
-                helperText={formik.touched.title && formik.errors.title} 
-                size='small' 
-                style={{width: '98%'}} 
-                placeholder="Enter the Employee's Title"
-              />
-            </div>
+  const handleCloseDeleteEmployee = () => {
+    setSelectedEmployee(null)
+    setOpenDeleteEmployeeModal(false)
+  }
 
-            <div style={{width: '100%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Department</p>
-              <TextField
-                name="department"
-                onChange={formik.handleChange} 
-                value={formik?.values?.department} 
-                error={formik.touched.department && Boolean(formik.errors.department)}
-                helperText={formik.touched.department && formik.errors.department} 
-                size='small' 
-                style={{width: '98%'}} 
-                placeholder="Enter the Employee's Department"
-              />
-            </div>
+  const handleSubmitDeleteEmployee = async () => {
+    const userJSON = localStorage.getItem('currentEmployee');
+    const parsedUser = JSON.parse(userJSON);
 
-            <div style={{width: '100%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Phone</p>
-              <TextField
-                name="phone"
-                onChange={formik.handleChange} 
-                value={formik?.values?.phone} 
-                error={formik.touched.phone && Boolean(formik.errors.phone)}
-                helperText={formik.touched.phone && formik.errors.phone} 
-                size='small' 
-                placeholder="Enter the Employee's Phone Number"
-                style={{width: '98%'}} 
-              />
-            </div>
-
-            <div style={{width: '100%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Role</p>
-              <Select
-                name="role"
-                onChange={formik.handleChange} 
-                value={formik?.values?.role} 
-                error={formik.touched.role && Boolean(formik.errors.role)}
-                helperText={formik.touched.role && formik.errors.role} 
-                size='small' 
-                placeholder="Test"
-                style={{width: '98%'}} 
-              >
-                <MenuItem value='employee'>Employee</MenuItem>
-                <MenuItem value='hrManager'>HR Manager</MenuItem>
-              </Select>
-            </div>
-
-            <div style={{width: '49.5%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Password</p>
-              <TextField
-                type='password'
-                placeholder="Enter the Employee's Password"
-                name="password"
-                onChange={formik.handleChange} 
-                value={formik?.values?.password} 
-                error={formik.touched.password && Boolean(formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password} 
-                size='small' 
-                style={{width: '98%'}} 
-              />
-            </div>
-
-            <div style={{width: '49.5%', marginTop: 10}}>
-              <p className="source-font" style={{margin: '10px 0'}}>Confirm Password</p>
-              <TextField
-                type='password'
-                placeholder="Confirm Employee's Password"
-                name="confirmPassword"
-                onChange={formik.handleChange} 
-                value={formik?.values?.confirmPassword} 
-                error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                helperText={formik.touched.confirmPassword && formik.errors.confirmPassword} 
-                size='small' 
-                style={{width: '98%'}} 
-              />
-            </div>
-
-            <div style={{ width: '100%', display:'flex', justifyContent: 'end'}}>
-              <Button 
-                className="source-font"
-                style={{
-                  background: '#0b0045', color: 'white', textTransform:'capitalize', marginTop: 25, width: '20', marginRight: 10
-                }}
-                startIcon={<CheckIcon></CheckIcon>}
-                type="submit"
-              >
-                Submit
-              </Button>
-            </div>
-          </form>
-        </Box>
-      </Modal>
-    )
+    const result = await userServices.deleteUser(selectedEmployee.id, parsedUser.token)
+    if(result.status === 200) {
+      const newEmployees = employees.filter(e => e.id !== selectedEmployee.id)
+      setEmployees(newEmployees)
+      setSelectedEmployee(null)
+      setOpenDeleteEmployeeModal(false)
+    }
   }
   
   return (
@@ -264,7 +87,7 @@ export default function Company() {
                   background: '#0b0045', color: 'white', textTransform:'capitalize'
                 }}
                 startIcon={<AddIcon></AddIcon>}
-                onClick={() => setOpenModal(true)}
+                onClick={() => setOpenAddEmployeeModal(true)}
               >
                 Add Employee
               </Button>
@@ -278,6 +101,8 @@ export default function Company() {
                     <TableCell style={{color:'white'}}  className="source-font">Email</TableCell>
                     <TableCell style={{color:'white'}}  className="source-font">Role</TableCell>
                     <TableCell style={{color:'white'}}  className="source-font">Department</TableCell>
+                    <TableCell style={{color:'white'}}  className="source-font">Title</TableCell>
+                    <TableCell style={{color:'white'}}  className="source-font">Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 
@@ -289,6 +114,19 @@ export default function Company() {
                         <TableCell component='th' scope="row">{e.email}</TableCell>
                         <TableCell component='th' scope="row">{e.role === 'hrManager' ? "HR Manger" : "Employee"}</TableCell>
                         <TableCell component='th' scope="row">{e.department}</TableCell>
+                        <TableCell component='th' scope="row">{e.title}</TableCell>
+                        <TableCell component='th' scope="row">
+                          <div>
+                            <IconButton aria-label="delete" onClick={() => handleClickUpdateEmployee(e)}>
+                              <EditIcon style={{fontSize: 19, color: "#0b0045"}} />
+                            </IconButton>
+                            {e.id !== userId && (
+                              <IconButton onClick={() => handleClickDeleteEmployee(e)} aria-label="delete">
+                                <DeleteIcon style={{fontSize: 19, color: "#eb4304"}} />
+                              </IconButton>
+                            )}
+                          </div>
+                        </TableCell>
                       </TableRow>
                     )
                   })}
@@ -297,7 +135,45 @@ export default function Company() {
             </TableContainer>
           </div>
 
-          {addEmployeeModal()}
+          <AddEmployeeModal 
+            employees={employees} 
+            setEmployees={setEmployees} 
+            openAddEmployeeModal={openAddEmployeeModal} 
+            setOpenAddEmployeeModal={setOpenAddEmployeeModal} 
+          />
+          <UpdateEmployeeModal 
+            selectedEmployee={selectedEmployee} 
+            setSelectedEmployee={setSelectedEmployee}
+            openUpdateEmployeeModal={openUpdateEmployeeModal} 
+            setOpenUpdateEmployeeModal={setOpenUpdateEmployeeModal}
+            employees={employees}
+            setEmployees={setEmployees}
+          />
+
+          <Modal
+            open={openDeleteEmployeeModal}
+            onClose={handleCloseDeleteEmployee}
+          >
+            <Box sx={style}>
+              <div style={{ width: '100%'}}>
+                <p className="source-font-bold" style={{ fontSize: 20, margin: 0, marginTop: -5}}>Remove Employee</p>
+              </div>
+
+              <p style={{ marginTop: 20}}>Are you sure you want to remove this employee?</p>
+
+              <div style={{ width: '100%', display:'flex', justifyContent: 'end'}}>
+                <Button
+                  onClick={handleSubmitDeleteEmployee}
+                  className="source-font"
+                  style={{
+                    background: '#0b0045', color: 'white', textTransform:'capitalize',width: '20', marginRight: 10
+                  }}
+                >
+                  Yes
+                </Button>
+              </div>
+            </Box>
+          </Modal>
       </div>
     </>
   )

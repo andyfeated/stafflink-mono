@@ -29,7 +29,6 @@ loginRouter.post('/', async (req, res) => {
   }
 
   const token = jwt.sign(employeeForToken, config.JWT_SECRET, { expiresIn: '2d' })
-  console.log(employee)
 
   res.status(200).send({
     token,

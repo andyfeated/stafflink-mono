@@ -29,4 +29,9 @@ const updateUser = (id, token, values) => {
   return request
 }
 
-export default { signUp, getUser, getUsers, addUser, updateUser }
+const deleteUser = (id, token) => {
+  const request = axios.delete(`${apiUrl}/${id}`, { headers: { Authorization: token }})
+  return request
+}
+
+export default { signUp, getUser, getUsers, addUser, updateUser, deleteUser }

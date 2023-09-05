@@ -106,7 +106,6 @@ users.get('/', authChecker, async (req, res) => {
       if (err){
         reject()
       } else {
-        console.log(existingComp)
         resolve(existingComp)
       }
     })
@@ -124,6 +123,7 @@ users.put('/:id', authChecker, async (req, res) => {
     firstName,
     lastName,
     phone,
+    role,
   } = req.body
 
   const employee = await new Promise((resolve, reject) => {
@@ -139,10 +139,10 @@ users.put('/:id', authChecker, async (req, res) => {
   if(!employee){
     res.status(404).send({ error: "Employee not found"})
   }
-
+  
   db.run(
-    "UPDATE employees SET first_name = ?, last_name = ?, email = ?, phone = ?, title = ?, department = ? WHERE id = ?", 
-    [firstName, lastName, email, phone, title, department, id]
+    "UPDATE employees SET first_name = ?, last_name = ?, email = ?, phone = ?, title = ?, department = ?, role = ? WHERE id = ?", 
+    [firstName, lastName, email, phone, title, department, role || employee.role, id]
   )
   
   const updatedEmployee = await new Promise((resolve, reject) => {
@@ -217,6 +217,31 @@ users.post('/', authChecker, async (req, res) => {
   })
 
   res.status(200).send(newEmployee)
+})
+
+users.delete('/:id', authChecker, async (req, res) => {
+  const id = req.params.id
+
+  const employee = await new Promise((resolve, reject) => {
+    db.get("SELECT * FROM employees WHERE id = ?;", [id], (err, existingEmp) => {
+      if (err){
+        reject()
+      } else {
+        resolve(existingEmp)
+      }
+    })
+  })
+
+  if(!employee){
+    res.status(404).send({ error: "Employee not found"})
+  }
+  
+  db.run(
+    "DELETE FROM employees WHERE id = ?", 
+    [id]
+  )
+  
+  res.status(200).send({ isCompleted: true})
 })
 
 module.exports = users

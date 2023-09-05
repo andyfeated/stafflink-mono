@@ -27,11 +27,11 @@ export default function Profile() {
   const [editProfile, setEditProfile] = useState(false)
   const [openSuccess, setOpenSuccess] = useState(false)
 
-  const handleUpdateUser = async (values) => {
+  const handleUpdateUser = async ({ role, ...rest}) => {
     const userJSON = localStorage.getItem('currentEmployee');
     const parsedUser = JSON.parse(userJSON);
 
-    await userServices.updateUser(userId, parsedUser.token, values)
+    await userServices.updateUser(userId, parsedUser.token, rest)
     setOpenSuccess(true)
     setEditProfile(false)
   }
