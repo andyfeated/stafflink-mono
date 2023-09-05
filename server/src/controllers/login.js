@@ -29,11 +29,15 @@ loginRouter.post('/', async (req, res) => {
   }
 
   const token = jwt.sign(employeeForToken, config.JWT_SECRET, { expiresIn: '2d' })
+  console.log(employee)
 
   res.status(200).send({
     token,
     email: employee.email,
-    name: `${employee['first_name']} ${employee['last_name']}`
+    name: `${employee['first_name']} ${employee['last_name']}`,
+    id: employee.id,
+    role: employee.role,
+    companyId: employee.company_id
   })
 })
 

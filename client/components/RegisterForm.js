@@ -36,7 +36,6 @@ const validationSchema = yup.object({
 
 
 export default function RegisterForm({ setActiveTab, setOpenSuccess }){
-  
   const handleSubmitRegister = async (values) => {
     try {
       const result = await userServices.signUp(values)

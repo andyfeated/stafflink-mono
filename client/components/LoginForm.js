@@ -26,7 +26,7 @@ export default function LoginForm({ setActiveTab, setOpenError }){
       const result = await loginServices.login(values)
       
       if(result.data){
-        setUser({ name: result.data.name, email: result.data.email })
+        setUser({ name: result.data.name, email: result.data.email, id: result.data.id, role: result.data.role, companyId: result.data.companyId })
         localStorage.setItem('currentEmployee', JSON.stringify(result.data))
         router.push('/')
       }
