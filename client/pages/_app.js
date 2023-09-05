@@ -2,13 +2,12 @@ import '../styles/globals.css'
 import { useEffect } from 'react';
 import { useRouter } from 'next/router'
 import useUserStore from '../stores/userStore';
-
+import Head from 'next/head'
 
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
   const setUser = useUserStore((state) => state.setUser)
-  const id = useUserStore((state) => state.id)
   
   useEffect(() => {
     const userJSON = localStorage.getItem('currentEmployee');
@@ -22,7 +21,14 @@ function MyApp({ Component, pageProps }) {
     }
   }, []);
   
-  return <Component {...pageProps} />
+  return (
+    <>
+      <Head>
+        <title>Stafflink</title>
+      </Head>
+      <Component {...pageProps} />
+    </>
+  )
 }
 
 export default MyApp
