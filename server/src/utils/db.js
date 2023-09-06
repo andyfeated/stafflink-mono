@@ -47,6 +47,19 @@ const db = new sqlite3.Database('./stafflink_database.db', (err) => {
       }
     })
 
+    db.run('CREATE TABLE attendance( \
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
+      date TEXT NOT NULL, \
+      employee_id INTEGER, \
+      company_id INTEGER, \
+      FOREIGN KEY(employee_id) REFERENCES employee(id)\
+      FOREIGN KEY(company_id) REFERENCES company(id)\
+    )', (err) => {
+      if (err) {
+        console.log("Attendance Table already exists")
+      }
+    })
+
   }
 })
 

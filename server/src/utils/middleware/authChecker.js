@@ -8,7 +8,7 @@ const authChecker = (req, res, next) => {
     return res.send({ error: "Forbidden"})
   }
 
-  if (Date.now() >= decodedToken.exp * 1000) {
+  if (Date.now() >= decodedToken?.exp * 1000) {
     return res.send({ error: "Token is Expired"})
   }
   
