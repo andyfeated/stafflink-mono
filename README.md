@@ -1,7 +1,9 @@
 # Stafflink: HR Management App
 #### Video Demo:  <URL HERE>
 #### Description:
-Stafflink a Project that was made for the PSET 10 of Harvard CS50 Course. It is an HR Management App designed for simplicity and reliability due to it's straightforward UI.
+Stafflink is a Full Stack Web App Project that was made for the PSET 10 of Harvard CS50 Course. It is an HR Management App designed for simplicity and reliability due to it's straightforward UI.
+
+![App Screenshot](readme_feature.png)
 
 #### Features:
 
