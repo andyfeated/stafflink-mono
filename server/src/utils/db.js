@@ -34,6 +34,19 @@ const db = new sqlite3.Database('./stafflink_database.db', (err) => {
       }
     })
 
+    db.run('CREATE TABLE announcements( \
+      id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, \
+      text TEXT NOT NULL, \
+      start_date TEXT NOT NULL, \
+      end_date TEXT NOT NULL, \
+      company_id INTEGER, \
+      FOREIGN KEY(company_id) REFERENCES company(id)\
+    )', (err) => {
+      if (err) {
+        console.log("Announcement Table already exists")
+      }
+    })
+
   }
 })
 

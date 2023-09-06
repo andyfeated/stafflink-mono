@@ -130,6 +130,7 @@ export default function RegisterForm({ setActiveTab, setOpenSuccess }){
             size='small' 
             style={{width: '90%', marginTop: 15}} 
             label="Work Email"
+            autoComplete="off"
           />
           <TextField 
             name="password" 

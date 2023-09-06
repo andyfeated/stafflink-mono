@@ -95,10 +95,6 @@ export default function Header({ activeTab }){
             <AnnouncementIcon style={{color: 'white', fontSize: 25}}></AnnouncementIcon>
             <p className="source-font" style={{ color: 'white', margin: 0}}>Buletin</p>
           </div>
-          <div onClick={() => handleClickPage('documents')} style={{ width: 120, padding: 10, cursor: 'pointer', background: activeTab === 'documents' ? "#e94100" : '', borderRadius: '10px 10px 0 0'  }}>
-            <TaskIcon style={{color: 'white', fontSize: 25}}></TaskIcon>
-            <p className="source-font" style={{ color: 'white', margin: 0}}>Documents</p>
-          </div>
         </>
        )}
       </div>
